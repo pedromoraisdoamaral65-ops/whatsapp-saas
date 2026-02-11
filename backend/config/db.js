@@ -2,22 +2,24 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    // Pega a variável MONGO_URI do Render ou MONGODB_URI local
+    // Usar MONGO_URI (Render) ou MONGODB_URI (local) como fallback
     const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
-
+    
     if (!mongoUri) {
-      throw new Error("❌ Variável de ambiente MONGO_URI não definida!");
+      throw new Error('MONGO_URI ou MONGODB_URI não definida nas variáveis de ambiente');
     }
 
-    await mongoose.connect(mongoUri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
-    });
+    console.log('🔄 Conectando ao MongoDB...');
+    
+    const conn = await mongoose.connect(mongoUri);
 
     console.log('✅ MongoDB conectado com sucesso!');
-  } catch (err) {
-    console.error('❌ Erro ao conectar MongoDB:', err);
-    process.exit(1); // Para o backend se não conectar
+    console.log(`📍 Host: ${conn.connection.host}`);
+    console.log(`📊 Database: ${conn.connection.name}`);
+  } catch (error) {
+    console.error('❌ Erro ao conectar MongoDB:', error.message);
+    console.error('💡 Verifique se a MONGO_URI está correta nas variáveis de ambiente');
+    process.exit(1);
   }
 };
 
